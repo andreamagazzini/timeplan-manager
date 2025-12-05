@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+.history
 
 # debug
 npm-debug.log*
@@ -39,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# lock files (keep only npm lock, pnpm lock should be committed)
+package-lock.json
+yarn.lock
