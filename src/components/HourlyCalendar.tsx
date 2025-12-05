@@ -413,18 +413,16 @@ export default function HourlyCalendar({ pharmacists, shifts, date, pharmacyRule
                     setIsModalOpen(true);
                   }}
                 >
-                  <div className="flex flex-col justify-center h-full">
-                    <span className="truncate font-medium">{getPharmacistName(shift.pharmacistId)}</span>
-                    <div className="flex items-center gap-1">
-                      {getPatternShortForm(shift) && (
-                        <span className="text-xs opacity-75 truncate">
-                          {getPatternShortForm(shift)}
-                        </span>
-                      )}
-                      <span className="text-xs opacity-75 font-semibold">
-                        {formatHours(calculateShiftHours(shift.startTime, shift.endTime))}
+                  <div className="flex flex-col justify-center items-center h-full text-center">
+                    <span className="truncate font-medium w-full">{getPharmacistName(shift.pharmacistId)}</span>
+                    <span className="text-xs opacity-75 font-semibold">
+                      {formatHours(calculateShiftHours(shift.startTime, shift.endTime))}
+                    </span>
+                    {getPatternShortForm(shift) && (
+                      <span className="text-xs opacity-75 truncate w-full">
+                        {getPatternShortForm(shift)}
                       </span>
-                    </div>
+                    )}
                     </div>
                 </div>
               );
