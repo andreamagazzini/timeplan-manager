@@ -1,9 +1,10 @@
 import { db } from './db';
+import { Pharmacist, Schedule, PharmacyRules } from '@/types';
 
 export interface DataExport {
-  pharmacists: any[];
-  schedules: any[];
-  pharmacyRules: any[];
+  pharmacists: Pharmacist[];
+  schedules: Schedule[];
+  pharmacyRules: PharmacyRules | null;
   exportedAt: string;
   version: string;
 }
@@ -13,10 +14,11 @@ export interface DataExport {
  * Useful for backup and migration
  */
 export async function exportAllData(): Promise<DataExport> {
+  const pharmacyRules = await db.pharmacyRules.get('default');
   const data: DataExport = {
     pharmacists: await db.pharmacists.toArray(),
     schedules: await db.schedules.toArray(),
-    pharmacyRules: await db.pharmacyRules.toArray(),
+    pharmacyRules: pharmacyRules || null,
     exportedAt: new Date().toISOString(),
     version: '1.0',
   };
@@ -54,8 +56,8 @@ export async function importData(data: DataExport): Promise<void> {
     await db.schedules.bulkPut(data.schedules);
   }
   
-  if (data.pharmacyRules && data.pharmacyRules.length > 0) {
-    await db.pharmacyRules.bulkPut(data.pharmacyRules);
+  if (data.pharmacyRules) {
+    await db.pharmacyRules.put({ ...data.pharmacyRules, id: 'default' });
   }
   
   console.log('✅ Data imported successfully');
@@ -72,7 +74,7 @@ export async function importFromFile(file: File): Promise<void> {
         const data = JSON.parse(e.target?.result as string) as DataExport;
         await importData(data);
         resolve();
-      } catch (error) {
+      } catch {
         reject(new Error('Invalid file format'));
       }
     };

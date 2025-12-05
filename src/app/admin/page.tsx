@@ -5,7 +5,7 @@ import { Calendar, Clock, Users, Plus, Download, Trash2, X } from 'lucide-react'
 import { DataManager } from '@/lib/data';
 import { ScheduleGenerator } from '@/lib/scheduler';
 import { exportScheduleToICS, downloadICS } from '@/lib/export';
-import { Pharmacist, Schedule, Shift } from '@/types';
+import { Pharmacist, Schedule, Shift, PharmacyRules } from '@/types';
 import { useLanguage } from '@/lib/language-context';
 import HourlyCalendar from '@/components/HourlyCalendar';
 
@@ -47,6 +47,11 @@ export default function AdminDashboard() {
       const dataManager = DataManager.getInstance();
       const pharmacists = await dataManager.getPharmacistsAsync();
       const pharmacyRules = await dataManager.getPharmacyRulesAsync();
+      
+      if (!pharmacyRules) {
+        alert(t.admin.noPharmacyRules);
+        return;
+      }
       
       console.log('Generating schedule with pharmacyRules:', pharmacyRules.staffingRequirements.map(r => 
         `${r.startTime}-${r.endTime} (${r.requiredPharmacists})`

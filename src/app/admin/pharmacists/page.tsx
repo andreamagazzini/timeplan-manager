@@ -138,7 +138,7 @@ export default function PharmacistsPage() {
                         content = '🎉';
                         bgColor = 'bg-blue-100';
                         textColor = 'text-blue-700';
-                      } else if (dayPattern) {
+                      } else if (dayPattern && pharmacyRules) {
                         const pattern = pharmacyRules.fixedShiftPatterns?.find(p => p.id === dayPattern.patternId);
                         content = pattern?.shortForm || dayPattern.patternId.substring(0, 3).toUpperCase();
                         bgColor = 'bg-green-100';
@@ -168,7 +168,7 @@ export default function PharmacistsPage() {
       </div>
 
       {/* Add Pharmacist Modal */}
-      {isAddModalOpen && (
+      {isAddModalOpen && pharmacyRules && (
         <PharmacistModal
           pharmacyRules={pharmacyRules}
           onSave={handleAddPharmacist}
@@ -177,7 +177,7 @@ export default function PharmacistsPage() {
       )}
 
       {/* Edit Pharmacist Modal */}
-      {editingPharmacist && (
+      {editingPharmacist && pharmacyRules && (
         <PharmacistModal
           pharmacist={editingPharmacist}
           pharmacyRules={pharmacyRules}
@@ -195,12 +195,14 @@ export default function PharmacistsPage() {
 
 interface PharmacistModalProps {
   pharmacist?: Pharmacist;
-  pharmacyRules: PharmacyRules;
+  pharmacyRules: PharmacyRules | null;
   onSave: (pharmacist: Pharmacist | Omit<Pharmacist, 'id'>) => void;
   onClose: () => void;
 }
 
 function PharmacistModal({ pharmacist, pharmacyRules, onSave, onClose }: PharmacistModalProps) {
+  const { t } = useLanguage();
+  
   // Initialize formData: convert freeDay to fixedDayPatterns format
   const initializeFormData = () => {
     const fixedDayPatterns = pharmacist?.fixedDayPatterns || [];
@@ -286,7 +288,7 @@ function PharmacistModal({ pharmacist, pharmacyRules, onSave, onClose }: Pharmac
 
   // Get pattern options including "Free Day"
   const getPatternOptions = () => {
-    const patternOptions = (pharmacyRules.fixedShiftPatterns || []).map(pattern => ({
+    const patternOptions = (pharmacyRules?.fixedShiftPatterns || []).map(pattern => ({
       value: pattern.id,
       label: `${pattern.name}${pattern.shortForm ? ` (${pattern.shortForm})` : ''}`,
     }));
@@ -434,7 +436,7 @@ function PharmacistModal({ pharmacist, pharmacyRules, onSave, onClose }: Pharmac
                         content = '🎉';
                         bgColor = 'bg-blue-100';
                         textColor = 'text-blue-700';
-                      } else if (dayPattern) {
+                      } else if (dayPattern && pharmacyRules) {
                         const pattern = pharmacyRules.fixedShiftPatterns?.find(p => p.id === dayPattern.patternId);
                         content = pattern?.shortForm || dayPattern.patternId.substring(0, 3).toUpperCase();
                         bgColor = 'bg-green-100';
@@ -478,7 +480,7 @@ function PharmacistModal({ pharmacist, pharmacyRules, onSave, onClose }: Pharmac
                                     {isFreeDay && <span className="text-blue-600">✓</span>}
                                   </div>
                                 </button>
-                                {pharmacyRules.fixedShiftPatterns?.map((pattern) => {
+                                {pharmacyRules?.fixedShiftPatterns?.map((pattern) => {
                                   const isSelected = dayPattern?.patternId === pattern.id;
                                   return (
                                     <button

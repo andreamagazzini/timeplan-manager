@@ -10,7 +10,7 @@ export class DataManager {
   // Cache for sync methods
   private cache: {
     pharmacists?: Pharmacist[];
-    pharmacyRules?: PharmacyRules;
+    pharmacyRules?: PharmacyRules | null;
     schedules?: Schedule[];
     initialized: boolean;
   } = { initialized: false };
