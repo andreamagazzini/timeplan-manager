@@ -4,7 +4,7 @@ import { Pharmacist, Schedule, PharmacyRules } from '@/types';
 export interface DataExport {
   pharmacists: Pharmacist[];
   schedules: Schedule[];
-  pharmacyRules: PharmacyRules | null;
+  pharmacyRules: PharmacyRules | PharmacyRules[] | null; // Support both array (old) and single object (new) for backward compatibility
   exportedAt: string;
   version: string;
 }
@@ -56,8 +56,18 @@ export async function importData(data: DataExport): Promise<void> {
     await db.schedules.bulkPut(data.schedules);
   }
   
+  // Handle pharmacyRules: can be an array (old format) or a single object (new format) or null
   if (data.pharmacyRules) {
-    await db.pharmacyRules.put({ ...data.pharmacyRules, id: 'default' });
+    if (Array.isArray(data.pharmacyRules)) {
+      // Old format: array - take the first one or the one with id 'default'
+      const rules = data.pharmacyRules.find(r => r.id === 'default') || data.pharmacyRules[0];
+      if (rules) {
+        await db.pharmacyRules.put({ ...rules, id: 'default' });
+      }
+    } else {
+      // New format: single object
+      await db.pharmacyRules.put({ ...data.pharmacyRules, id: 'default' });
+    }
   }
   
   console.log('✅ Data imported successfully');
